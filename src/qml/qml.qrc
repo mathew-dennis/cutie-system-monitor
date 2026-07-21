@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>LineGraph.qml</file>
+        <file>PerformancePage.qml</file>
+        <file>MemoryPage.qml</file>
+        <file>NetworkPage.qml</file>
+    </qresource>
+</RCC>

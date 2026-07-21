@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.2
+Type=Application
+Name=System Monitor
+Exec=/usr/bin/cutie-sysmonitor
+TryExec=/usr/bin/cutie-sysmonitor
+Icon=cutie-sysmonitor
+Terminal=false
+StartupNotify=false
+Comment=View CPU, memory, and network activity
+Categories=System;Monitor;
