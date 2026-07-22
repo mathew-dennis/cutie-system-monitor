@@ -9,9 +9,6 @@
 
 // SystemMonitor polls /proc for CPU, memory, and network statistics on a
 // timer and exposes them to QML as a singleton (Cutie.SysMonitor 1.0).
-// Follows the same "poll -> compute -> NOTIFY" shape as the rest of the
-// Cutie backends (CutieVolume, CutieWlc, etc.) rather than pushing raw
-// /proc parsing into QML.
 class SystemMonitor : public QObject
 {
 	Q_OBJECT
@@ -63,9 +60,7 @@ class SystemMonitor : public QObject
 	QVariantList netRxHistory() const { return m_netRxHistory; }
 	QVariantList netTxHistory() const { return m_netTxHistory; }
 
-	// Formats a byte count as a human readable string (e.g. "512 MB").
 	Q_INVOKABLE QString formatBytes(quint64 bytes) const;
-	// Formats a byte-per-second rate as a human readable string (e.g. "1.2 MB/s").
 	Q_INVOKABLE QString formatRate(quint64 bytesPerSec) const;
 
     signals:
@@ -91,7 +86,7 @@ class SystemMonitor : public QObject
 	void readNetwork();
 
 	static bool readProcStat(QList<CpuTimes> *out);
-	static void pushHistory(QVariantList *history, double value, int maxLen);
+	static QVariantList pushHistory(QVariantList history, double value, int maxLen);
 
 	QTimer m_timer;
 	int m_intervalMs = 1000;
