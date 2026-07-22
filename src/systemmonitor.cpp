@@ -65,9 +65,16 @@ bool SystemMonitor::readProcStat(QList<CpuTimes> *out)
 
 void SystemMonitor::pushHistory(QVariantList *history, double value, int maxLen)
 {
-	history->append(value);
-	while (history->size() > maxLen)
-		history->removeFirst();
+	// Create a shallow copy to force a new memory reference
+	QVariantList newList = *history;
+	
+	newList.append(value);
+	while (newList.size() > maxLen) {
+		newList.removeFirst();
+	}
+	
+	// Assign the new list back to the pointer
+	*history = newList;
 }
 
 void SystemMonitor::readCpu()
