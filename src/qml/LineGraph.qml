@@ -1,10 +1,6 @@
 import QtQuick
 import Cutie
 
-// A small scrolling line/area graph, similar in spirit to the graphs in
-// gnome-system-monitor's Resources tab. Feed it a QVariantList of numbers
-// via `values`; it auto-scales to the largest value in the window unless
-// `maxValue` is set explicitly (e.g. 1.0 for a 0-100% CPU/RAM graph).
 Item {
 	id: root
 
@@ -25,12 +21,17 @@ Item {
 		id: canvas
 		anchors.fill: parent
 
+		Component.onCompleted: requestPaint()
+
 		onPaint: {
 			var ctx = getContext("2d");
 			ctx.reset();
 
 			var w = width;
 			var h = height;
+
+			if (w <= 0 || h <= 0)
+				return;
 
 			// Grid
 			ctx.strokeStyle = Qt.rgba(root.lineColor.r, root.lineColor.g, root.lineColor.b, 0.12);
