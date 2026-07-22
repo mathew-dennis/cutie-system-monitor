@@ -5,17 +5,13 @@
 
 SystemMonitor::SystemMonitor(QObject *parent) : QObject(parent)
 {
-	// Prime the "previous" samples so the first poll() doesn't report a
-	// bogus 100% spike from a zero baseline.
 	readProcStat(&m_prevCpuTimes);
-	m_coreCount = qMax(0, m_prevCpuTimes.size() - 1); // index 0 is the aggregate "cpu" line
+	m_coreCount = qMax(0, m_prevCpuTimes.size() - 1);
 	readNetwork();
 
 	connect(&m_timer, &QTimer::timeout, this, &SystemMonitor::poll);
 	m_timer.start(m_intervalMs);
 
-	// Run one poll immediately so pages have data as soon as they're shown
-	// instead of waiting a full interval.
 	poll();
 }
 
@@ -44,7 +40,6 @@ bool SystemMonitor::readProcStat(QList<CpuTimes> *out)
 		if (parts.size() < 8)
 			continue;
 
-		// user nice system idle iowait irq softirq steal ...
 		quint64 user = parts[1].toULongLong();
 		quint64 nice = parts[2].toULongLong();
 		quint64 system = parts[3].toULongLong();
@@ -63,18 +58,13 @@ bool SystemMonitor::readProcStat(QList<CpuTimes> *out)
 	return !out->isEmpty();
 }
 
-void SystemMonitor::pushHistory(QVariantList *history, double value, int maxLen)
+QVariantList SystemMonitor::pushHistory(QVariantList history, double value, int maxLen)
 {
-	// Create a shallow copy to force a new memory reference
-	QVariantList newList = *history;
-	
-	newList.append(value);
-	while (newList.size() > maxLen) {
-		newList.removeFirst();
+	history.append(value);
+	while (history.size() > maxLen) {
+		history.removeFirst();
 	}
-	
-	// Assign the new list back to the pointer
-	*history = newList;
+	return history;
 }
 
 void SystemMonitor::readCpu()
@@ -106,7 +96,7 @@ void SystemMonitor::readCpu()
 
 	m_cpuUsage = aggregateUsage;
 	m_perCoreUsage = perCore;
-	pushHistory(&m_cpuHistory, aggregateUsage, kHistoryLength);
+	m_cpuHistory = pushHistory(m_cpuHistory, aggregateUsage, kHistoryLength);
 	m_prevCpuTimes = current;
 
 	emit cpuChanged();
@@ -132,7 +122,6 @@ void SystemMonitor::readMemory()
 		if (parts.isEmpty())
 			continue;
 
-		// Values in /proc/meminfo are reported in kB.
 		values[key] = parts[0].toULongLong() * 1024;
 	}
 
@@ -150,7 +139,7 @@ void SystemMonitor::readMemory()
 	double usedFraction = m_memTotal > 0
 		? static_cast<double>(m_memUsed) / static_cast<double>(m_memTotal)
 		: 0.0;
-	pushHistory(&m_memHistory, usedFraction, kHistoryLength);
+	m_memHistory = pushHistory(m_memHistory, usedFraction, kHistoryLength);
 
 	emit memChanged();
 }
@@ -162,7 +151,6 @@ void SystemMonitor::readNetwork()
 		return;
 
 	QTextStream in(&f);
-	// Skip the two header lines.
 	if (!in.atEnd())
 		in.readLine();
 	if (!in.atEnd())
@@ -222,11 +210,8 @@ void SystemMonitor::readNetwork()
 	m_totalTxBytes = txBytesSum;
 	m_prevNet = current;
 
-	// Normalise against a soft ceiling so the graph has a sensible scale
-	// even on quiet links; the LineGraph component still auto-scales to
-	// whatever the actual max in the window is.
-	pushHistory(&m_netRxHistory, static_cast<double>(rxRateSum), kHistoryLength);
-	pushHistory(&m_netTxHistory, static_cast<double>(txRateSum), kHistoryLength);
+	m_netRxHistory = pushHistory(m_netRxHistory, static_cast<double>(rxRateSum), kHistoryLength);
+	m_netTxHistory = pushHistory(m_netTxHistory, static_cast<double>(txRateSum), kHistoryLength);
 
 	emit netChanged();
 }
