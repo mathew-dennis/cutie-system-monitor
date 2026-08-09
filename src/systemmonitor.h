@@ -132,34 +132,6 @@ public:
 
 	CpuInfo* cpu() { return &m_cpu; }
 
-	// Memory Getters
-	quint64 memTotal() const { return m_memTotal; }
-	quint64 memUsed() const { return m_memUsed; }
-	quint64 memAvailable() const { return m_memAvailable; }
-	quint64 memCached() const { return m_memCached; }
-	quint64 memBuffers() const { return m_memBuffers; }
-	quint64 swapTotal() const { return m_swapTotal; }
-	quint64 swapUsed() const { return m_swapUsed; }
-	QVariantList memHistory() const { return m_memHistory; }
-
-	// Network Getters
-	QVariantList networkInterfaces() const { return m_networkInterfaces; }
-	quint64 totalRxRate() const { return m_totalRxRate; }
-	quint64 totalTxRate() const { return m_totalTxRate; }
-	quint64 totalRxBytes() const { return m_totalRxBytes; }
-	quint64 totalTxBytes() const { return m_totalTxBytes; }
-	QVariantList netRxHistory() const { return m_netRxHistory; }
-	QVariantList netTxHistory() const { return m_netTxHistory; }
-
-	Q_INVOKABLE QString formatBytes(quint64 bytes) const;
-	Q_INVOKABLE QString formatRate(quint64 bytesPerSec) const;
-
-	static QVariantList pushHistory(QVariantList history, double value, int maxLen);
-
-signals:
-	void memChanged();
-	void netChanged();
-
 private slots:
 	void poll();
 
@@ -178,25 +150,5 @@ private:
 	// CPU Instance
 	CpuInfo m_cpu;
 
-	// Memory
-	quint64 m_memTotal = 0;
-	quint64 m_memUsed = 0;
-	quint64 m_memAvailable = 0;
-	quint64 m_memCached = 0;
-	quint64 m_memBuffers = 0;
-	quint64 m_swapTotal = 0;
-	quint64 m_swapUsed = 0;
-	QVariantList m_memHistory;
 
-	// Network
-	QMap<QString, NetSample> m_prevNet;
-	QVariantList m_networkInterfaces;
-	quint64 m_totalRxRate = 0;
-	quint64 m_totalTxRate = 0;
-	quint64 m_totalRxBytes = 0;
-	quint64 m_totalTxBytes = 0;
-	QVariantList m_netRxHistory;
-	QVariantList m_netTxHistory;
-
-	static const int kHistoryLength = 60;
 };
