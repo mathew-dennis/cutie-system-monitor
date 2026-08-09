@@ -105,9 +105,10 @@ void WifiInfo::updateWirelessDetails()
 	// Read signal level and link information from /proc/net/wireless
 	QFile wirelessFile("/proc/net/wireless");
 	if (wirelessFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		QTextStream in(&wirelessFile);
-		while (!in.atEnd()) {
-			QString line = in.readLine();
+		// procfs reports size() == 0, which makes atEnd() true immediately;
+		// read everything up front instead of looping on atEnd().
+		const QStringList lines = QString::fromUtf8(wirelessFile.readAll()).split('\n');
+		for (const QString &line : lines) {
 			if (line.contains(m_interfaceName)) {
 				QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
 				if (parts.size() >= 3) {
