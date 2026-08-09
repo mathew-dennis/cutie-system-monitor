@@ -17,9 +17,10 @@ void CpuInfo::readStaticInfo()
 	// 1. Read CPU Model Name
 	QFile cpuInfoFile("/proc/cpuinfo");
 	if (cpuInfoFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		QTextStream in(&cpuInfoFile);
-		while (!in.atEnd()) {
-			QString line = in.readLine();
+		// procfs files report size() == 0, so QTextStream::atEnd() is true
+		// before anything is read. readAll() + split avoids relying on it.
+		const QStringList lines = QString::fromUtf8(cpuInfoFile.readAll()).split('\n');
+		for (const QString &line : lines) {
 			if (line.startsWith("model name") || line.startsWith("Hardware")) {
 				int colon = line.indexOf(':');
 				if (colon != -1) {
@@ -94,11 +95,11 @@ bool CpuInfo::readProcStat(QList<CpuTimes> *out)
 	if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	QTextStream in(&f);
 	out->clear();
+	// Same atEnd()-on-procfs pitfall as readStaticInfo() above.
+	const QStringList lines = QString::fromUtf8(f.readAll()).split('\n');
 
-	while (!in.atEnd()) {
-		QString line = in.readLine();
+	for (const QString &line : lines) {
 		if (!line.startsWith("cpu"))
 			break;
 
