@@ -46,10 +46,22 @@ Item {
 					}
 					spacing: 10
 
-					CutieLabel {
-						text: qsTr("Network")
-						font.bold: true
-						font.pixelSize: 16
+					RowLayout {
+						Layout.fillWidth: true
+
+						CutieLabel {
+							text: qsTr("Network")
+							font.bold: true
+							font.pixelSize: 16
+							Layout.fillWidth: true
+						}
+
+						CutieLabel {
+							text: SysMonitor.network.ssid
+							font.pixelSize: 13
+							opacity: 0.7
+							elide: Text.ElideRight
+						}
 					}
 
 					RowLayout {
@@ -60,7 +72,7 @@ Item {
 							spacing: 6
 							Rectangle { width: 10; height: 10; radius: 5; color: Atmosphere.textColor }
 							CutieLabel {
-								text: qsTr("Down: %1").arg(SysMonitor.formatRate(SysMonitor.totalRxRate))
+								text: qsTr("Down: %1").arg(SysMonitor.formatRate(SysMonitor.network.receiveSpeed))
 								font.pixelSize: 13
 								opacity: 0.8
 							}
@@ -70,7 +82,7 @@ Item {
 							spacing: 6
 							Rectangle { width: 10; height: 10; radius: 5; color: Atmosphere.primaryColor }
 							CutieLabel {
-								text: qsTr("Up: %1").arg(SysMonitor.formatRate(SysMonitor.totalTxRate))
+								text: qsTr("Up: %1").arg(SysMonitor.formatRate(SysMonitor.network.sendSpeed))
 								font.pixelSize: 13
 								opacity: 0.8
 							}
@@ -83,14 +95,14 @@ Item {
 
 						LineGraph {
 							anchors.fill: parent
-							values: SysMonitor.netRxHistory
+							values: SysMonitor.network.receiveHistory
 							lineColor: Atmosphere.textColor
 							fillOpacity: 0.15
 						}
 
 						LineGraph {
 							anchors.fill: parent
-							values: SysMonitor.netTxHistory
+							values: SysMonitor.network.sendHistory
 							lineColor: Atmosphere.primaryColor
 							fillOpacity: 0.08
 						}
@@ -99,7 +111,7 @@ Item {
 					RowLayout {
 						Layout.fillWidth: true
 						CutieLabel {
-							text: qsTr("Total received: %1").arg(SysMonitor.formatBytes(SysMonitor.totalRxBytes))
+							text: qsTr("Total received: %1").arg(SysMonitor.formatBytes(SysMonitor.network.totalReceived))
 							font.pixelSize: 12
 							opacity: 0.6
 							Layout.fillWidth: true
@@ -108,7 +120,7 @@ Item {
 					RowLayout {
 						Layout.fillWidth: true
 						CutieLabel {
-							text: qsTr("Total sent: %1").arg(SysMonitor.formatBytes(SysMonitor.totalTxBytes))
+							text: qsTr("Total sent: %1").arg(SysMonitor.formatBytes(SysMonitor.network.totalSent))
 							font.pixelSize: 12
 							opacity: 0.6
 							Layout.fillWidth: true
@@ -117,16 +129,16 @@ Item {
 				}
 			}
 
-			// ── Interfaces card ──────────────────────────────────────
+			// ── Connection card ──────────────────────────────────────
 			Rectangle {
 				width: parent.width - 32
 				anchors.horizontalCenter: parent.horizontalCenter
-				height: ifaceLayout.implicitHeight + cardPadding * 2
+				height: connLayout.implicitHeight + cardPadding * 2
 				color: cardColor
 				radius: cardRadius
 
 				ColumnLayout {
-					id: ifaceLayout
+					id: connLayout
 					anchors {
 						left: parent.left
 						right: parent.right
@@ -135,59 +147,77 @@ Item {
 					}
 					spacing: 14
 
-					CutieLabel {
-						text: qsTr("Interfaces")
-						font.bold: true
-						font.pixelSize: 16
-					}
-
-					CutieLabel {
-						visible: SysMonitor.networkInterfaces.length === 0
-						text: qsTr("No active interfaces")
-						font.pixelSize: 13
-						opacity: 0.6
-					}
-
-					Repeater {
-						model: SysMonitor.networkInterfaces
-
-						ColumnLayout {
+					RowLayout {
+						Layout.fillWidth: true
+						CutieLabel {
+							text: qsTr("Connection")
+							font.bold: true
+							font.pixelSize: 16
 							Layout.fillWidth: true
-							spacing: 6
+						}
+						CutieLabel {
+							text: qsTr("Signal: %1%").arg(SysMonitor.network.signalStrength)
+							font.pixelSize: 13
+							opacity: 0.7
+						}
+					}
 
-							RowLayout {
-								Layout.fillWidth: true
-								CutieLabel {
-									text: modelData.name
-									font.pixelSize: 14
-									font.bold: true
-									Layout.fillWidth: true
-								}
-							}
+					Rectangle {
+						Layout.fillWidth: true
+						height: 6
+						radius: 3
+						color: Atmosphere.primaryAlphaColor
 
-							RowLayout {
-								Layout.fillWidth: true
-								CutieLabel {
-									text: qsTr("↓ %1").arg(SysMonitor.formatRate(modelData.rxRate))
-									font.pixelSize: 12
-									opacity: 0.7
-									Layout.fillWidth: true
-								}
-								CutieLabel {
-									text: qsTr("↑ %1").arg(SysMonitor.formatRate(modelData.txRate))
-									font.pixelSize: 12
-									opacity: 0.7
-								}
-							}
+						Rectangle {
+							height: parent.height
+							width: parent.width * (SysMonitor.network.signalStrength / 100)
+							radius: 3
+							color: Atmosphere.textColor
 
-							Rectangle {
-								Layout.fillWidth: true
-								height: 1
-								color: Atmosphere.secondaryAlphaColor
-								opacity: 0.2
-								visible: index < SysMonitor.networkInterfaces.length - 1
+							Behavior on width {
+								NumberAnimation { duration: 400; easing.type: Easing.OutQuad }
 							}
 						}
+					}
+
+					GridLayout {
+						Layout.fillWidth: true
+						columns: 2
+						columnSpacing: 12
+						rowSpacing: 6
+
+						CutieLabel { text: qsTr("Adapter:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel {
+							text: SysMonitor.network.adapterName
+							font.pixelSize: 12
+							font.bold: true
+							elide: Text.ElideRight
+							Layout.fillWidth: true
+						}
+
+						CutieLabel { text: qsTr("Interface:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.network.interfaceName; font.pixelSize: 12; font.bold: true }
+
+						CutieLabel { text: qsTr("Type:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.network.connectionType; font.pixelSize: 12; font.bold: true }
+
+						CutieLabel { text: qsTr("Frequency:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.network.frequency; font.pixelSize: 12; font.bold: true }
+
+						CutieLabel { text: qsTr("IPv4 address:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.network.ipv4Address; font.pixelSize: 12; font.bold: true }
+
+						CutieLabel { text: qsTr("IPv6 address:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel {
+							text: SysMonitor.network.ipv6Address
+							font.pixelSize: 12
+							font.bold: true
+							elide: Text.ElideRight
+							Layout.fillWidth: true
+						}
+
+						CutieLabel { text: qsTr("MAC address:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.network.hardwareAddress; font.pixelSize: 12; font.bold: true }
 					}
 				}
 			}

@@ -16,10 +16,10 @@ Item {
 	property int cardRadius: 16
 	property int cardPadding: 20
 
-	readonly property real usedFraction: SysMonitor.memTotal > 0
-		? SysMonitor.memUsed / SysMonitor.memTotal : 0
-	readonly property real swapFraction: SysMonitor.swapTotal > 0
-		? SysMonitor.swapUsed / SysMonitor.swapTotal : 0
+	readonly property real usedFraction: SysMonitor.memory.total > 0
+		? SysMonitor.memory.inUse / SysMonitor.memory.total : 0
+	readonly property real swapFraction: SysMonitor.memory.swapTotal > 0
+		? SysMonitor.memory.swapUsed / SysMonitor.memory.swapTotal : 0
 
 	Flickable {
 		anchors.fill: parent
@@ -71,15 +71,15 @@ Item {
 					LineGraph {
 						Layout.fillWidth: true
 						Layout.preferredHeight: 140
-						values: SysMonitor.memHistory
+						values: SysMonitor.memory.usageHistory
 						maxValue: 1.0
 						lineColor: Atmosphere.textColor
 					}
 
 					CutieLabel {
 						text: qsTr("%1 of %2 used")
-							.arg(SysMonitor.formatBytes(SysMonitor.memUsed))
-							.arg(SysMonitor.formatBytes(SysMonitor.memTotal))
+							.arg(SysMonitor.formatBytes(SysMonitor.memory.inUse))
+							.arg(SysMonitor.formatBytes(SysMonitor.memory.total))
 						font.pixelSize: 13
 						opacity: 0.7
 					}
@@ -112,10 +112,10 @@ Item {
 
 					Repeater {
 						model: [
-							{ label: qsTr("Used"), value: SysMonitor.memUsed },
-							{ label: qsTr("Cached"), value: SysMonitor.memCached },
-							{ label: qsTr("Buffers"), value: SysMonitor.memBuffers },
-							{ label: qsTr("Available"), value: SysMonitor.memAvailable }
+							{ label: qsTr("In use"), value: SysMonitor.memory.inUse },
+							{ label: qsTr("Available"), value: SysMonitor.memory.total - SysMonitor.memory.inUse },
+							{ label: qsTr("Cached"), value: SysMonitor.memory.cache },
+							{ label: qsTr("Committed"), value: SysMonitor.memory.committed }
 						]
 
 						RowLayout {
@@ -142,7 +142,7 @@ Item {
 				height: swapLayout.implicitHeight + cardPadding * 2
 				color: cardColor
 				radius: cardRadius
-				visible: SysMonitor.swapTotal > 0
+				visible: SysMonitor.memory.swapTotal > 0
 
 				ColumnLayout {
 					id: swapLayout
@@ -189,10 +189,55 @@ Item {
 
 					CutieLabel {
 						text: qsTr("%1 of %2 used")
-							.arg(SysMonitor.formatBytes(SysMonitor.swapUsed))
-							.arg(SysMonitor.formatBytes(SysMonitor.swapTotal))
+							.arg(SysMonitor.formatBytes(SysMonitor.memory.swapUsed))
+							.arg(SysMonitor.formatBytes(SysMonitor.memory.swapTotal))
 						font.pixelSize: 13
 						opacity: 0.7
+					}
+				}
+			}
+
+			// ── Memory module card ───────────────────────────────────
+			Rectangle {
+				width: parent.width - 32
+				anchors.horizontalCenter: parent.horizontalCenter
+				height: moduleLayout.implicitHeight + cardPadding * 2
+				color: cardColor
+				radius: cardRadius
+
+				ColumnLayout {
+					id: moduleLayout
+					anchors {
+						left: parent.left
+						right: parent.right
+						top: parent.top
+						margins: cardPadding
+					}
+					spacing: 10
+
+					CutieLabel {
+						text: qsTr("Memory module")
+						font.bold: true
+						font.pixelSize: 16
+					}
+
+					GridLayout {
+						Layout.fillWidth: true
+						columns: 2
+						columnSpacing: 12
+						rowSpacing: 6
+
+						CutieLabel { text: qsTr("Speed:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.memory.speed; font.pixelSize: 12; font.bold: true }
+
+						CutieLabel { text: qsTr("Slots used:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.memory.slotsInUse; font.pixelSize: 12; font.bold: true }
+
+						CutieLabel { text: qsTr("Form factor:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.memory.formFactor; font.pixelSize: 12; font.bold: true }
+
+						CutieLabel { text: qsTr("Type:"); font.pixelSize: 12; opacity: 0.65 }
+						CutieLabel { text: SysMonitor.memory.type; font.pixelSize: 12; font.bold: true }
 					}
 				}
 			}
