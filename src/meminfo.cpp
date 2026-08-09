@@ -30,9 +30,10 @@ void MemoryInfo::initStaticInfo()
 	// Read total RAM and total Swap from /proc/meminfo once
 	QFile file("/proc/meminfo");
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		QTextStream in(&file);
-		while (!in.atEnd()) {
-			QString line = in.readLine();
+		// procfs reports size() == 0, which makes atEnd() true immediately;
+		// read everything up front instead of looping on atEnd().
+		const QStringList lines = QString::fromUtf8(file.readAll()).split('\n');
+		for (const QString &line : lines) {
 			if (line.startsWith("MemTotal:")) {
 				m_total = extractKbToBytes(line);
 			} else if (line.startsWith("SwapTotal:")) {
@@ -58,9 +59,8 @@ void MemoryInfo::updateMemoryStats()
 
 	QFile file("/proc/meminfo");
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		QTextStream in(&file);
-		while (!in.atEnd()) {
-			QString line = in.readLine();
+		const QStringList lines = QString::fromUtf8(file.readAll()).split('\n');
+		for (const QString &line : lines) {
 			if (line.startsWith("MemAvailable:")) {
 				// MemAvailable is a better indicator of free memory than MemFree
 				memFree = extractKbToBytes(line);
