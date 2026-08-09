@@ -6,18 +6,109 @@
 #include <QVariantMap>
 #include <QMap>
 #include <QString>
+#include <QList>
 
-// SystemMonitor polls /proc for CPU, memory, and network statistics on a
-// timer and exposes them to QML as a singleton (Cutie.SysMonitor 1.0).
+// ============================================================================
+// CPU MONITOR MODULE (Moved to Top)
+// ============================================================================
+
+class CpuInfo : public QObject
+{
+	Q_OBJECT
+
+	// Static Properties (Read once at startup)
+	Q_PROPERTY(QString name READ name CONSTANT)
+	Q_PROPERTY(int coreCount READ coreCount CONSTANT)
+	Q_PROPERTY(QString baseSpeed READ baseSpeed CONSTANT)
+	Q_PROPERTY(QString l1Cache READ l1Cache CONSTANT)
+	Q_PROPERTY(QString l2Cache READ l2Cache CONSTANT)
+	Q_PROPERTY(QString l3Cache READ l3Cache CONSTANT)
+
+	// Dynamic Properties (Polled periodically)
+	Q_PROPERTY(double utilization READ utilization NOTIFY updated)
+	Q_PROPERTY(QString speed READ speed NOTIFY updated)
+	Q_PROPERTY(quint64 threads READ threads NOTIFY updated)
+	Q_PROPERTY(quint64 processes READ processes NOTIFY updated)
+	Q_PROPERTY(quint64 handles READ handles NOTIFY updated)
+	Q_PROPERTY(QString uptime READ uptime NOTIFY updated)
+
+	// Graph Data
+	Q_PROPERTY(QVariantList history READ history NOTIFY updated)
+	Q_PROPERTY(QVariantList perCoreUsage READ perCoreUsage NOTIFY updated)
+
+public:
+	explicit CpuInfo(QObject *parent = nullptr);
+
+	// Static Getters
+	QString name() const { return m_name; }
+	int coreCount() const { return m_coreCount; }
+	QString baseSpeed() const { return m_baseSpeed; }
+	QString l1Cache() const { return m_l1Cache; }
+	QString l2Cache() const { return m_l2Cache; }
+	QString l3Cache() const { return m_l3Cache; }
+
+	// Dynamic Getters
+	double utilization() const { return m_utilization; }
+	QString speed() const { return m_speed; }
+	quint64 threads() const { return m_threads; }
+	quint64 processes() const { return m_processes; }
+	quint64 handles() const { return m_handles; }
+	QString uptime() const { return m_uptime; }
+
+	// Graph Getters
+	QVariantList history() const { return m_history; }
+	QVariantList perCoreUsage() const { return m_perCoreUsage; }
+
+	void readStaticInfo();
+	void pollDynamicInfo(int intervalMs, QVariantList (*pushHistoryFunc)(QVariantList, double, int), int maxHistory);
+
+signals:
+	void updated();
+
+private:
+	struct CpuTimes {
+		quint64 idle = 0;
+		quint64 total = 0;
+	};
+
+	bool readProcStat(QList<CpuTimes> *out);
+	void updateFrequenciesAndUsage(const QList<CpuTimes> &current);
+	void updateSystemCounters();
+
+	// Static Data
+	QString m_name = "Unknown Processor";
+	int m_coreCount = 0;
+	QString m_baseSpeed = "N/A";
+	QString m_l1Cache = "N/A";
+	QString m_l2Cache = "N/A";
+	QString m_l3Cache = "N/A";
+
+	// Dynamic Data
+	double m_utilization = 0.0;
+	QString m_speed = "0.00 GHz";
+	quint64 m_threads = 0;
+	quint64 m_processes = 0;
+	quint64 m_handles = 0;
+	QString m_uptime = "0:00:00:00";
+
+	// Graph / Multi-core Data
+	QVariantList m_history;
+	QVariantList m_perCoreUsage;
+	QList<CpuTimes> m_prevCpuTimes;
+};
+
+// ============================================================================
+// SYSTEM MONITOR MAIN CLASS
+// ============================================================================
+
 class SystemMonitor : public QObject
 {
 	Q_OBJECT
 
-	Q_PROPERTY(double cpuUsage READ cpuUsage NOTIFY cpuChanged)
-	Q_PROPERTY(QVariantList perCoreUsage READ perCoreUsage NOTIFY cpuChanged)
-	Q_PROPERTY(QVariantList cpuHistory READ cpuHistory NOTIFY cpuChanged)
-	Q_PROPERTY(int coreCount READ coreCount CONSTANT)
+	// CPU Property Object (Access via cpu.name, cpu.utilization, cpu.history, etc.)
+	Q_PROPERTY(CpuInfo* cpu READ cpu CONSTANT)
 
+	// Memory Properties
 	Q_PROPERTY(quint64 memTotal READ memTotal NOTIFY memChanged)
 	Q_PROPERTY(quint64 memUsed READ memUsed NOTIFY memChanged)
 	Q_PROPERTY(quint64 memAvailable READ memAvailable NOTIFY memChanged)
@@ -27,6 +118,7 @@ class SystemMonitor : public QObject
 	Q_PROPERTY(quint64 swapUsed READ swapUsed NOTIFY memChanged)
 	Q_PROPERTY(QVariantList memHistory READ memHistory NOTIFY memChanged)
 
+	// Network Properties
 	Q_PROPERTY(QVariantList networkInterfaces READ networkInterfaces NOTIFY netChanged)
 	Q_PROPERTY(quint64 totalRxRate READ totalRxRate NOTIFY netChanged)
 	Q_PROPERTY(quint64 totalTxRate READ totalTxRate NOTIFY netChanged)
@@ -35,14 +127,12 @@ class SystemMonitor : public QObject
 	Q_PROPERTY(QVariantList netRxHistory READ netRxHistory NOTIFY netChanged)
 	Q_PROPERTY(QVariantList netTxHistory READ netTxHistory NOTIFY netChanged)
 
-    public:
+public:
 	explicit SystemMonitor(QObject *parent = nullptr);
 
-	double cpuUsage() const { return m_cpuUsage; }
-	QVariantList perCoreUsage() const { return m_perCoreUsage; }
-	QVariantList cpuHistory() const { return m_cpuHistory; }
-	int coreCount() const { return m_coreCount; }
+	CpuInfo* cpu() { return &m_cpu; }
 
+	// Memory Getters
 	quint64 memTotal() const { return m_memTotal; }
 	quint64 memUsed() const { return m_memUsed; }
 	quint64 memAvailable() const { return m_memAvailable; }
@@ -52,6 +142,7 @@ class SystemMonitor : public QObject
 	quint64 swapUsed() const { return m_swapUsed; }
 	QVariantList memHistory() const { return m_memHistory; }
 
+	// Network Getters
 	QVariantList networkInterfaces() const { return m_networkInterfaces; }
 	quint64 totalRxRate() const { return m_totalRxRate; }
 	quint64 totalTxRate() const { return m_totalTxRate; }
@@ -63,40 +154,29 @@ class SystemMonitor : public QObject
 	Q_INVOKABLE QString formatBytes(quint64 bytes) const;
 	Q_INVOKABLE QString formatRate(quint64 bytesPerSec) const;
 
-    signals:
-	void cpuChanged();
+	static QVariantList pushHistory(QVariantList history, double value, int maxLen);
+
+signals:
 	void memChanged();
 	void netChanged();
 
-    private slots:
+private slots:
 	void poll();
 
-    private:
-	struct CpuTimes {
-		quint64 idle = 0;
-		quint64 total = 0;
-	};
+private:
 	struct NetSample {
 		quint64 rx = 0;
 		quint64 tx = 0;
 	};
 
-	void readCpu();
 	void readMemory();
 	void readNetwork();
-
-	static bool readProcStat(QList<CpuTimes> *out);
-	static QVariantList pushHistory(QVariantList history, double value, int maxLen);
 
 	QTimer m_timer;
 	int m_intervalMs = 1000;
 
-	// CPU
-	QList<CpuTimes> m_prevCpuTimes;
-	double m_cpuUsage = 0.0;
-	QVariantList m_perCoreUsage;
-	QVariantList m_cpuHistory;
-	int m_coreCount = 0;
+	// CPU Instance
+	CpuInfo m_cpu;
 
 	// Memory
 	quint64 m_memTotal = 0;
