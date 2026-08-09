@@ -7,7 +7,7 @@
 
 // 1. Include the headers for your sub-classes
 #include "systemmonitor.h"
-#include "cpu.h"
+#include "cpuinfo.h"
 #include "meminfo.h"
 #include "wifiinfo.h"
 
