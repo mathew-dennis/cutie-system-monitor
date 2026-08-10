@@ -123,19 +123,19 @@ CutiePage {
 					// --- 3. Swipeable Stats Pages ---
 					ColumnLayout {
 						Layout.fillWidth: true
-						spacing: 8
+						spacing: 4
 
 						SwipeView {
 							id: statsSwipeView
 							Layout.fillWidth: true
-							Layout.preferredHeight: 170 // Adjust height as needed for your content grid
-                            clip: true
+							Layout.preferredHeight: 170
+							clip: true
 
 							// Page 1: Live Dynamic Metrics
 							GridLayout {
 								columns: 2
-								columnSpacing: 24
-								rowSpacing: 14
+								columnSpacing: 18
+								rowSpacing: 12
 								Layout.fillWidth: true
 
 								// Utilization
@@ -184,8 +184,8 @@ CutiePage {
 							// Page 2: Static Hardware Info & Caches
 							GridLayout {
 								columns: 2
-								columnSpacing: 16
-								rowSpacing: 8
+								columnSpacing: 8
+								rowSpacing: 6
 								Layout.fillWidth: true
 
 								CutieLabel { text: qsTr("Base speed:"); font.pixelSize: 12; opacity: 0.65 }
@@ -253,7 +253,7 @@ CutiePage {
 					GridLayout {
 						Layout.fillWidth: true
 						columns: 2
-						columnSpacing: 16
+						columnSpacing: 10
 						rowSpacing: 12
 
 						Repeater {
