@@ -22,6 +22,7 @@ CutiePage {
 		? SysMonitor.memory.swapUsed / SysMonitor.memory.swapTotal : 0
 
 	Flickable {
+		id: pageFlickable
 		anchors.fill: parent
 		contentHeight: mainColumn.height + 40
 		clip: true
@@ -36,16 +37,16 @@ CutiePage {
 				width: parent.width
 			}
 
-			// ── RAM card ─────────────────────────────────────────────
+			// ── Memory Card ───────────────────────────────────────────
 			Rectangle {
 				width: parent.width - 32
 				anchors.horizontalCenter: parent.horizontalCenter
-				height: ramLayout.implicitHeight + cardPadding * 2
+				height: memCardLayout.implicitHeight + cardPadding * 2
 				color: cardColor
 				radius: cardRadius
 
 				ColumnLayout {
-					id: ramLayout
+					id: memCardLayout
 					anchors {
 						left: parent.left
 						right: parent.right
@@ -54,198 +55,166 @@ CutiePage {
 					}
 					spacing: 10
 
+					// --- 1. Header ---
 					RowLayout {
 						Layout.fillWidth: true
 
 						CutieLabel {
 							text: qsTr("Memory")
 							font.bold: true
-							font.pixelSize: 16
-							Layout.fillWidth: true
+							font.pixelSize: 20
 						}
+
+						Item { Layout.fillWidth: true }
 
 						CutieLabel {
 							text: Math.round(memPage.usedFraction * 100) + "%"
-							font.pixelSize: 16
-							opacity: 0.8
+							font.pixelSize: 12
+							font.bold: true
+							opacity: 0.85
 						}
 					}
 
-					LineGraph {
+					// --- 2. Graph Container ---
+					ColumnLayout {
 						Layout.fillWidth: true
-						Layout.preferredHeight: 140
-						values: SysMonitor.memory.usageHistory
-						maxValue: 1.0
-						lineColor: Atmosphere.textColor
-					}
-
-					CutieLabel {
-						text: qsTr("%1 of %2 used")
-							.arg(SysMonitor.formatBytes(SysMonitor.memory.inUse))
-							.arg(SysMonitor.formatBytes(SysMonitor.memory.total))
-						font.pixelSize: 13
-						opacity: 0.7
-					}
-				}
-			}
-
-			// ── Breakdown card ───────────────────────────────────────
-			Rectangle {
-				width: parent.width - 32
-				anchors.horizontalCenter: parent.horizontalCenter
-				height: breakdownLayout.implicitHeight + cardPadding * 2
-				color: cardColor
-				radius: cardRadius
-
-				ColumnLayout {
-					id: breakdownLayout
-					anchors {
-						left: parent.left
-						right: parent.right
-						top: parent.top
-						margins: cardPadding
-					}
-					spacing: 14
-
-					CutieLabel {
-						text: qsTr("Breakdown")
-						font.bold: true
-						font.pixelSize: 16
-					}
-
-					Repeater {
-						model: [
-							{ label: qsTr("In use"), value: SysMonitor.memory.inUse },
-							{ label: qsTr("Available"), value: SysMonitor.memory.total - SysMonitor.memory.inUse },
-							{ label: qsTr("Cached"), value: SysMonitor.memory.cache },
-							{ label: qsTr("Committed"), value: SysMonitor.memory.committed }
-						]
+						spacing: 4
 
 						RowLayout {
 							Layout.fillWidth: true
 							CutieLabel {
-								text: modelData.label
-								font.pixelSize: 14
-								Layout.fillWidth: true
+								text: "% Utilization"
+								font.pixelSize: 11
+								opacity: 0.6
 							}
+							Item { Layout.fillWidth: true }
 							CutieLabel {
-								text: SysMonitor.formatBytes(modelData.value)
-								font.pixelSize: 14
-								opacity: 0.7
+								text: "100%"
+								font.pixelSize: 11
+								opacity: 0.6
 							}
 						}
-					}
-				}
-			}
 
-			// ── Swap card ────────────────────────────────────────────
-			Rectangle {
-				width: parent.width - 32
-				anchors.horizontalCenter: parent.horizontalCenter
-				height: swapLayout.implicitHeight + cardPadding * 2
-				color: cardColor
-				radius: cardRadius
-				visible: SysMonitor.memory.swapTotal > 0
-
-				ColumnLayout {
-					id: swapLayout
-					anchors {
-						left: parent.left
-						right: parent.right
-						top: parent.top
-						margins: cardPadding
-					}
-					spacing: 10
-
-					RowLayout {
-						Layout.fillWidth: true
-						CutieLabel {
-							text: qsTr("Swap")
-							font.bold: true
-							font.pixelSize: 16
+						LineGraph {
 							Layout.fillWidth: true
+							Layout.preferredHeight: 140
+							values: SysMonitor.memory.usageHistory
+							maxValue: 1.0
+							lineColor: Atmosphere.textColor
 						}
-						CutieLabel {
-							text: Math.round(memPage.swapFraction * 100) + "%"
-							font.pixelSize: 16
-							opacity: 0.8
-						}
-					}
 
-					Rectangle {
-						Layout.fillWidth: true
-						height: 8
-						radius: 4
-						color: Atmosphere.primaryAlphaColor
-
-						Rectangle {
-							height: parent.height
-							width: parent.width * memPage.swapFraction
-							radius: 4
-							color: Atmosphere.textColor
-
-							Behavior on width {
-								NumberAnimation { duration: 400; easing.type: Easing.OutQuad }
+						RowLayout {
+							Layout.fillWidth: true
+							CutieLabel {
+								text: "60 seconds"
+								font.pixelSize: 11
+								opacity: 0.6
+							}
+							Item { Layout.fillWidth: true }
+							CutieLabel {
+								text: "0"
+								font.pixelSize: 11
+								opacity: 0.6
 							}
 						}
 					}
 
-					CutieLabel {
-						text: qsTr("%1 of %2 used")
-							.arg(SysMonitor.formatBytes(SysMonitor.memory.swapUsed))
-							.arg(SysMonitor.formatBytes(SysMonitor.memory.swapTotal))
-						font.pixelSize: 13
-						opacity: 0.7
-					}
-				}
-			}
+					Item { Layout.preferredHeight: 8 }
 
-			// ── Memory module card ───────────────────────────────────
-			Rectangle {
-				width: parent.width - 32
-				anchors.horizontalCenter: parent.horizontalCenter
-				height: moduleLayout.implicitHeight + cardPadding * 2
-				color: cardColor
-				radius: cardRadius
-
-				ColumnLayout {
-					id: moduleLayout
-					anchors {
-						left: parent.left
-						right: parent.right
-						top: parent.top
-						margins: cardPadding
-					}
-					spacing: 10
-
-					CutieLabel {
-						text: qsTr("Memory module")
-						font.bold: true
-						font.pixelSize: 16
-					}
-
-					GridLayout {
+					// --- 3. Swipeable Stats Pages ---
+					ColumnLayout {
 						Layout.fillWidth: true
-						columns: 2
-						columnSpacing: 12
-						rowSpacing: 6
+						spacing: 4
 
-						CutieLabel { text: qsTr("Speed:"); font.pixelSize: 12; opacity: 0.65 }
-						CutieLabel { text: SysMonitor.memory.speed; font.pixelSize: 12; font.bold: true }
+						SwipeView {
+							id: statsSwipeView
+							Layout.fillWidth: true
+							Layout.preferredHeight: 170
+							clip: true
 
-						CutieLabel { text: qsTr("Slots used:"); font.pixelSize: 12; opacity: 0.65 }
-						CutieLabel { text: SysMonitor.memory.slotsInUse; font.pixelSize: 12; font.bold: true }
+							// Page 1: Dynamic Metrics Layout (matching reference image structure)
+							GridLayout {
+								columns: 2
+								columnSpacing: 12
+								rowSpacing: 14
+								Layout.fillWidth: true
 
-						CutieLabel { text: qsTr("Form factor:"); font.pixelSize: 12; opacity: 0.65 }
-						CutieLabel { text: SysMonitor.memory.formFactor; font.pixelSize: 12; font.bold: true }
+								// In use
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("In use"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.memory.inUse); font.pixelSize: 18; font.bold: true }
+								}
 
-						CutieLabel { text: qsTr("Type:"); font.pixelSize: 12; opacity: 0.65 }
-						CutieLabel { text: SysMonitor.memory.type; font.pixelSize: 12; font.bold: true }
+								// Available
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Available"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.memory.total - SysMonitor.memory.inUse); font.pixelSize: 18; font.bold: true }
+								}
+
+								// Committed
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Committed"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.memory.committed); font.pixelSize: 18; font.bold: true }
+								}
+
+								// Cached
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Cached"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.memory.cache); font.pixelSize: 18; font.bold: true }
+								}
+
+								// Swap used
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Swap used"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.memory.swapUsed); font.pixelSize: 18; font.bold: true }
+								}
+
+								// Swap available
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Swap available"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.memory.swapTotal - SysMonitor.memory.swapUsed); font.pixelSize: 18; font.bold: true }
+								}
+							}
+
+							// Page 2: Static Memory Module Info
+							GridLayout {
+								columns: 2
+								columnSpacing: 12
+								rowSpacing: 10
+								Layout.fillWidth: true
+
+								CutieLabel { text: qsTr("Speed:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.memory.speed; font.pixelSize: 12; font.bold: true }
+
+								CutieLabel { text: qsTr("Slots used:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.memory.slotsInUse; font.pixelSize: 12; font.bold: true }
+
+								CutieLabel { text: qsTr("Form factor:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.memory.formFactor; font.pixelSize: 12; font.bold: true }
+
+								CutieLabel { text: qsTr("Type:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.memory.type; font.pixelSize: 12; font.bold: true }
+							}
+						}
+
+						// Page Indicator Dots
+						PageIndicator {
+							id: pageIndicator
+							count: statsSwipeView.count
+							currentIndex: statsSwipeView.currentIndex
+							Layout.alignment: Qt.AlignHCenter
+						}
 					}
 				}
 			}
 
-			Item { width: 1; height: 24 }
+			Item { width: 1; height: 16 }
 		}
 	}
 }
