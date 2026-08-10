@@ -3,6 +3,7 @@ import Cutie
 
 Item {
 	id: root
+	clip: true
 
 	property var values: []
 	property real maxValue: 1.0 // 1.0 = 100% utilization
@@ -12,6 +13,7 @@ Item {
 	property int verticalGridLines: 10 // Vertical grid divisions
 
 	implicitHeight: 160
+	implicitWidth: 0
 
 	onValuesChanged: canvas.requestPaint()
 	onMaxValueChanged: canvas.requestPaint()
