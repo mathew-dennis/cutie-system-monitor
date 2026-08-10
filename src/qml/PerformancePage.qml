@@ -53,25 +53,26 @@ CutiePage {
 					// --- 1. Header: "CPU" + Model Name ---
 					RowLayout {
 						Layout.fillWidth: true
-							spacing: 12
+						spacing: 16
 
-							CutieLabel {
-								text: qsTr("CPU")
-								font.bold: true
-								font.pixelSize: 20
-								Layout.alignment: Qt.AlignTop
-							}
+						CutieLabel {
+							text: qsTr("CPU")
+							font.bold: true
+							font.pixelSize: 20
+							Layout.alignment: Qt.AlignTop
+						}
 
-							CutieLabel {
-								text: SysMonitor.cpu.name
-								font.pixelSize: 12
-								font.bold: true
-								opacity: 0.85
-								Layout.fillWidth: true
-								Layout.maximumWidth: Math.max(0, parent.width - cpuTitleLabel.implicitWidth - 12)
-								wrapMode: Text.WordWrap
-								maximumLineCount: 2
-								Layout.alignment: Qt.AlignTop
+						CutieLabel {
+							text: SysMonitor.cpu.name
+							font.pixelSize: 12
+							font.bold: true
+							opacity: 0.85
+							wrapMode: Text.WordWrap
+							Layout.fillWidth: true
+							Layout.alignment: Qt.AlignTop
+							horizontalAlignment: Text.AlignRight
+						}
+					}
 
 					// --- 2. Graph Container with Text Overlay Labels ---
 					ColumnLayout {
