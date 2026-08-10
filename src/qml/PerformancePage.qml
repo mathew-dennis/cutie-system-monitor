@@ -120,149 +120,105 @@ CutiePage {
 
 					Item { Layout.preferredHeight: 8 }
 
-					// --- 3. Stats Grid ---
-					RowLayout {
+					// --- 3. Swipeable Stats Pages ---
+					ColumnLayout {
 						Layout.fillWidth: true
-						spacing: 24
+						spacing: 8
 
-						// Left Side: Live Dynamic Metrics
-						GridLayout {
-							columns: 2
-							columnSpacing: 24
-							rowSpacing: 14
-							Layout.alignment: Qt.AlignTop
+						SwipeView {
+							id: statsSwipeView
+							Layout.fillWidth: true
+							Layout.preferredHeight: 170 // Adjust height as needed for your content grid
 
-							// Utilization
-							ColumnLayout {
-								spacing: 2
-								CutieLabel {
-									text: qsTr("Utilization")
-									font.pixelSize: 12
-									opacity: 0.65
+							// Page 1: Live Dynamic Metrics
+							GridLayout {
+								columns: 2
+								columnSpacing: 24
+								rowSpacing: 14
+								Layout.fillWidth: true
+
+								// Utilization
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Utilization"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: Math.round(SysMonitor.cpu.utilization * 100) + "%"; font.pixelSize: 20; font.bold: true }
 								}
-								CutieLabel {
-									text: Math.round(SysMonitor.cpu.utilization * 100) + "%"
-									font.pixelSize: 20
-									font.bold: true
+
+								// Speed
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Speed"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.cpu.speed; font.pixelSize: 20; font.bold: true }
+								}
+
+								// Processes
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Processes"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.cpu.processes; font.pixelSize: 18; font.bold: true }
+								}
+
+								// Threads
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Threads"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.cpu.threads; font.pixelSize: 18; font.bold: true }
+								}
+
+								// Handles
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Handles"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.cpu.handles; font.pixelSize: 18; font.bold: true }
+								}
+
+								// Up time
+								ColumnLayout {
+									spacing: 2
+									CutieLabel { text: qsTr("Up time"); font.pixelSize: 12; opacity: 0.65 }
+									CutieLabel { text: SysMonitor.cpu.uptime; font.pixelSize: 18; font.bold: true }
 								}
 							}
 
-							// Speed
-							ColumnLayout {
-								spacing: 2
-								CutieLabel {
-									text: qsTr("Speed")
-									font.pixelSize: 12
-									opacity: 0.65
-								}
-								CutieLabel {
-									text: SysMonitor.cpu.speed
-									font.pixelSize: 20
-									font.bold: true
-								}
-							}
+							// Page 2: Static Hardware Info & Caches
+							GridLayout {
+								columns: 2
+								columnSpacing: 16
+								rowSpacing: 8
+								Layout.fillWidth: true
 
-							// Processes
-							ColumnLayout {
-								spacing: 2
-								CutieLabel {
-									text: qsTr("Processes")
-									font.pixelSize: 12
-									opacity: 0.65
-								}
-								CutieLabel {
-									text: SysMonitor.cpu.processes
-									font.pixelSize: 18
-									font.bold: true
-								}
-							}
+								CutieLabel { text: qsTr("Base speed:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.cpu.baseSpeed; font.pixelSize: 12; font.bold: true }
 
-							// Threads
-							ColumnLayout {
-								spacing: 2
-								CutieLabel {
-									text: qsTr("Threads")
-									font.pixelSize: 12
-									opacity: 0.65
-								}
-								CutieLabel {
-									text: SysMonitor.cpu.threads
-									font.pixelSize: 18
-									font.bold: true
-								}
-							}
+								CutieLabel { text: qsTr("Sockets:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: "1"; font.pixelSize: 12; font.bold: true }
 
-							// Handles
-							ColumnLayout {
-								spacing: 2
-								CutieLabel {
-									text: qsTr("Handles")
-									font.pixelSize: 12
-									opacity: 0.65
-								}
-								CutieLabel {
-									text: SysMonitor.cpu.handles
-									font.pixelSize: 18
-									font.bold: true
-								}
-							}
+								CutieLabel { text: qsTr("Cores:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.cpu.coreCount; font.pixelSize: 12; font.bold: true }
 
-							// Up time
-							ColumnLayout {
-								spacing: 2
-								CutieLabel {
-									text: qsTr("Up time")
-									font.pixelSize: 12
-									opacity: 0.65
-								}
-								CutieLabel {
-									text: SysMonitor.cpu.uptime
-									font.pixelSize: 18
-									font.bold: true
-								}
+								CutieLabel { text: qsTr("Logical processors:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.cpu.coreCount; font.pixelSize: 12; font.bold: true }
+
+								CutieLabel { text: qsTr("Virtualization:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: qsTr("Enabled"); font.pixelSize: 12; font.bold: true }
+
+								CutieLabel { text: qsTr("L1 cache:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.cpu.l1Cache; font.pixelSize: 12; font.bold: true }
+
+								CutieLabel { text: qsTr("L2 cache:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.cpu.l2Cache; font.pixelSize: 12; font.bold: true }
+
+								CutieLabel { text: qsTr("L3 cache:"); font.pixelSize: 12; opacity: 0.65 }
+								CutieLabel { text: SysMonitor.cpu.l3Cache; font.pixelSize: 12; font.bold: true }
 							}
 						}
 
-						Item { Layout.fillWidth: true }
-
-						// Right Side: Static Hardware Info & Caches
-						GridLayout {
-							columns: 2
-							columnSpacing: 12
-							rowSpacing: 6
-							Layout.alignment: Qt.AlignTop
-
-							// Base speed
-							CutieLabel { text: qsTr("Base speed:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: SysMonitor.cpu.baseSpeed; font.pixelSize: 12; font.bold: true }
-
-							// Sockets
-							CutieLabel { text: qsTr("Sockets:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: "1"; font.pixelSize: 12; font.bold: true }
-
-							// Cores
-							CutieLabel { text: qsTr("Cores:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: SysMonitor.cpu.coreCount; font.pixelSize: 12; font.bold: true }
-
-							// Logical Processors
-							CutieLabel { text: qsTr("Logical processors:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: SysMonitor.cpu.coreCount; font.pixelSize: 12; font.bold: true }
-
-							// Virtualization
-							CutieLabel { text: qsTr("Virtualization:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: qsTr("Enabled"); font.pixelSize: 12; font.bold: true }
-
-							// L1 cache
-							CutieLabel { text: qsTr("L1 cache:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: SysMonitor.cpu.l1Cache; font.pixelSize: 12; font.bold: true }
-
-							// L2 cache
-							CutieLabel { text: qsTr("L2 cache:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: SysMonitor.cpu.l2Cache; font.pixelSize: 12; font.bold: true }
-
-							// L3 cache
-							CutieLabel { text: qsTr("L3 cache:"); font.pixelSize: 12; opacity: 0.65 }
-							CutieLabel { text: SysMonitor.cpu.l3Cache; font.pixelSize: 12; font.bold: true }
+						// Page Indicator Dots
+						PageIndicator {
+							id: pageIndicator
+							count: statsSwipeView.count
+							currentIndex: statsSwipeView.currentIndex
+							Layout.alignment: Qt.AlignHCenter
 						}
 					}
 				}
