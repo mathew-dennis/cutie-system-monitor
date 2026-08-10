@@ -132,7 +132,7 @@ CutiePage {
 							Layout.preferredHeight: 170
 							clip: true
 
-							// Page 1: Dynamic Metrics Layout (matching reference image structure)
+							// Page 1: Dynamic Metrics Layout
 							GridLayout {
 								columns: 2
 								columnSpacing: 12
@@ -210,6 +210,68 @@ CutiePage {
 							currentIndex: statsSwipeView.currentIndex
 							Layout.alignment: Qt.AlignHCenter
 						}
+					}
+				}
+			}
+
+			// ── Swap Card ────────────────────────────────────────────
+			Rectangle {
+				width: parent.width - 32
+				anchors.horizontalCenter: parent.horizontalCenter
+				height: swapLayout.implicitHeight + cardPadding * 2
+				color: cardColor
+				radius: cardRadius
+				visible: SysMonitor.memory.swapTotal > 0
+
+				ColumnLayout {
+					id: swapLayout
+					anchors {
+						left: parent.left
+						right: parent.right
+						top: parent.top
+						margins: cardPadding
+					}
+					spacing: 10
+
+					RowLayout {
+						Layout.fillWidth: true
+						CutieLabel {
+							text: qsTr("Swap")
+							font.bold: true
+							font.pixelSize: 16
+							Layout.fillWidth: true
+						}
+						CutieLabel {
+							text: Math.round(memPage.swapFraction * 100) + "%"
+							font.pixelSize: 16
+							opacity: 0.8
+						}
+					}
+
+					Rectangle {
+						Layout.fillWidth: true
+						height: 8
+						radius: 4
+						color: Atmosphere.primaryAlphaColor
+
+						Rectangle {
+							height: parent.height
+							width: parent.width * memPage.swapFraction
+							radius: 4
+							color: Atmosphere.textColor
+
+							Behavior on width {
+								NumberAnimation { duration: 400; easing.type: Easing.OutQuad }
+							}
+						}
+					}
+
+					CutieLabel {
+						text: qsTr("%1 of %2 used")
+							.arg(SysMonitor.formatBytes(SysMonitor.memory.swapUsed))
+							.arg(SysMonitor.formatBytes(SysMonitor.memory.swapTotal))
+						font.pixelSize: 13
+						opacity: 0.7
 					}
 				}
 			}
