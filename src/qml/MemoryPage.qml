@@ -4,7 +4,7 @@ import QtQuick.Controls
 import Cutie
 import Cutie.SysMonitor
 
-Item {
+CutiePage {
 	id: memPage
 
 	readonly property color cardColor: Qt.rgba(
@@ -31,7 +31,10 @@ Item {
 			width: parent.width
 			spacing: 24
 
-			Item { width: 1; height: 24 }
+			CutiePageHeader {
+				title: qsTr("Memory")
+				width: parent.width
+			}
 
 			// ── RAM card ─────────────────────────────────────────────
 			Rectangle {
