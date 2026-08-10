@@ -58,14 +58,18 @@ CutiePage {
 						CutieLabel {
 							text: qsTr("CPU")
 							font.bold: true
-							font.pixelSize: 16
-							Layout.fillWidth: true
+							font.pixelSize: 20
 						}
 
+						Item { Layout.fillWidth: true }
+
 						CutieLabel {
-							text: Math.round(SysMonitor.cpu.utilization * 100) + "%"
-							font.pixelSize: 16
-							opacity: 0.8
+							text: SysMonitor.cpu.name
+							font.pixelSize: 13
+							font.bold: true
+							opacity: 0.85
+							elide: Text.ElideRight
+							Layout.maximumWidth: parent.width * 0.6
 						}
 					}
 
@@ -78,10 +82,9 @@ CutiePage {
 					}
 
 					CutieLabel {
-						text: SysMonitor.cpu.name + qsTr(" · ") + SysMonitor.cpu.speed
+						text: Math.round(SysMonitor.cpu.utilization * 100) + qsTr("% · ") + SysMonitor.cpu.speed
 						font.pixelSize: 13
 						opacity: 0.7
-						elide: Text.ElideRight
 						Layout.fillWidth: true
 					}
 				}
