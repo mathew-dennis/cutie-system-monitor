@@ -128,7 +128,8 @@ CutiePage {
 						SwipeView {
 							id: statsSwipeView
 							Layout.fillWidth: true
-							Layout.preferredHeight: 170
+							Layout.preferredHeight: 140
+							clip: true
 
 							// Page 1: Live Dynamic Metrics
 							GridLayout {
