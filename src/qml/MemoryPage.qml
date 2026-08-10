@@ -60,7 +60,7 @@ CutiePage {
 						Layout.fillWidth: true
 
 						CutieLabel {
-							text: qsTr("Memory")
+							text: qsTr("RAM")
 							font.bold: true
 							font.pixelSize: 20
 						}
