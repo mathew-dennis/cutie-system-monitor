@@ -281,6 +281,8 @@ CutiePage {
                                         text: Math.round(coreDelegate.coreUsage * 100) + "%"
                                         font.pixelSize: 12
                                         opacity: 0.7
+                                        Layout.preferredWidth: 36
+                                        horizontalAlignment: Text.AlignRight
                                     }
                                 }
 
