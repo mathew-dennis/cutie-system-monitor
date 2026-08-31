@@ -52,7 +52,7 @@ CutieWindow {
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: 12
+                    anchors.margins: 4
                     spacing: 16
 
                     // 1. Thumbnail Graph Box
@@ -97,7 +97,7 @@ CutieWindow {
 
                         CutieLabel {
                             font.pixelSize: 12
-                            opacity: 0.8
+                            opacity: 0.9
                             text: {
                                 if (modelData.type === "cpu") {
                                     return Math.round(SysMonitor.cpu.utilization * 100) + "%  " + SysMonitor.cpu.speed;
