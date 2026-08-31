@@ -50,10 +50,10 @@ CutieWindow {
                 // Basic selection highlight
                 color: mouseArea.pressed ? Atmosphere.secondaryAlphaColor : "transparent"
 
-                RowLayout {
+				RowLayout {
                     anchors.fill: parent
                     anchors.margins: 12
-                    spacing: 4
+                    spacing: 12
 
                     // 1. Thumbnail Graph Box
                     Rectangle {
@@ -73,7 +73,6 @@ CutieWindow {
                             
                             // Auto-scale network max value, lock CPU/Mem to 1.0
                             maxValue: modelData.type === "network" ? 0 : 1.0
-
                             values: {
                                 if (modelData.type === "cpu") return SysMonitor.cpu.history;
                                 if (modelData.type === "memory") return SysMonitor.memory.usageHistory;
@@ -85,7 +84,6 @@ CutieWindow {
 
                     // 2. Dynamic Text Details
                     ColumnLayout {
-                        Layout.fillWidth: true
                         Layout.alignment: Qt.AlignVCenter
                         spacing: 2
 
@@ -93,11 +91,13 @@ CutieWindow {
                             text: modelData.title
                             font.pixelSize: 15
                             font.bold: true
+                            horizontalAlignment: Text.AlignLeft // Explicitly force left
                         }
 
                         CutieLabel {
                             font.pixelSize: 12
-                            opacity: 0.9
+                            opacity: 0.8
+                            horizontalAlignment: Text.AlignLeft // Explicitly force left
                             text: {
                                 if (modelData.type === "cpu") {
                                     return Math.round(SysMonitor.cpu.utilization * 100) + "%  " + SysMonitor.cpu.speed;
@@ -113,6 +113,11 @@ CutieWindow {
                                 return "";
                             }
                         }
+                    }
+
+                    
+                    Item {
+                        Layout.fillWidth: true 
                     }
                 }
 
