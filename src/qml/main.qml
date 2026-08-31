@@ -52,8 +52,8 @@ CutieWindow {
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: 4
-                    spacing: 16
+                    anchors.margins: 12
+                    spacing: 4
 
                     // 1. Thumbnail Graph Box
                     Rectangle {
