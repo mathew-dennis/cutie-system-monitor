@@ -28,34 +28,42 @@ DiskInfo::DiskInfo(QObject *parent) : QObject(parent)
 
 void DiskInfo::detectPrimaryDisk()
 {
-	QString rootDevice = rootMountDevice();
-	QString base = baseDeviceName(rootDevice);
+    QString rootDevice = rootMountDevice();
+    QString base = baseDeviceName(rootDevice);
 
-	QDir blockDir("/sys/block");
-	const QStringList allDevices = blockDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    QDir blockDir("/sys/block");
+    const QStringList allDevices = blockDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
-	QStringList realDevices;
-	for (const QString &dev : allDevices) {
-		if (dev.startsWith("loop") || dev.startsWith("ram") || dev.startsWith("zram"))
-			continue;
-		realDevices.append(dev);
-	}
+    QStringList realDevices;
+    for (const QString &dev : allDevices) {
+        // ADDED "dm-" to skip Device Mapper volumes
+        if (dev.startsWith("loop") || dev.startsWith("ram") || dev.startsWith("zram") || dev.startsWith("dm-"))
+            continue;
+        realDevices.append(dev);
+    }
 
-	if (!base.isEmpty() && realDevices.contains(base)) {
-		// Confirmed: this device is exactly where "/" is mounted.
-		m_device = base;
-		m_isSystemDisk = true;
-		return;
-	}
+    if (!base.isEmpty() && realDevices.contains(base)) {
+        // Confirmed: this device is exactly where "/" is mounted.
+        m_device = base;
+        m_isSystemDisk = true;
+        return;
+    }
 
-	// Root device couldn't be matched directly (e.g. reported via the synthetic
-	// "/dev/root" some Android/Halium initramfs setups use). Fall back to the
-	// only real storage device when there's no ambiguity -- true for virtually
-	// all phone/embedded targets, which have a single eMMC/UFS/NVMe disk.
-	if (!realDevices.isEmpty()) {
-		m_device = realDevices.first();
-		m_isSystemDisk = (realDevices.size() == 1);
-	}
+    // Explicitly prefer standard physical disks in mobile/embedded environments
+    const QStringList preferredDisks = {"sda", "mmcblk0", "nvme0n1"};
+    for (const QString &pref : preferredDisks) {
+        if (realDevices.contains(pref)) {
+            m_device = pref;
+            m_isSystemDisk = true;
+            return;
+        }
+    }
+
+    // Standard fallback
+    if (!realDevices.isEmpty()) {
+        m_device = realDevices.first();
+        m_isSystemDisk = (realDevices.size() == 1);
+    }
 }
 
 QString DiskInfo::rootMountDevice() const
