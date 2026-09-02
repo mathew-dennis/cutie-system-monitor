@@ -29,6 +29,12 @@ CutieWindow {
             title: qsTr("Wi-Fi"),
             color: "#d2691e", // Brown/Orange
             componentPath: "NetworkPage.qml"
+        },
+        {
+            type: "disk",
+            title: qsTr("Disk"),
+            color: "#2ca02c", // Green
+            componentPath: "DiskPage.qml"
         }
     ]
 
@@ -77,6 +83,7 @@ CutieWindow {
                                 if (modelData.type === "cpu") return SysMonitor.cpu.history;
                                 if (modelData.type === "memory") return SysMonitor.memory.usageHistory;
                                 if (modelData.type === "network") return SysMonitor.network.receiveHistory;
+                                if (modelData.type === "disk") return SysMonitor.disk.activeTimeHistory;
                                 return [];
                             }
                         }
@@ -109,6 +116,9 @@ CutieWindow {
                                 } else if (modelData.type === "network") {
                                     return "S: " + SysMonitor.formatRate(SysMonitor.network.sendSpeed) + 
                                            " R: " + SysMonitor.formatRate(SysMonitor.network.receiveSpeed);
+                                } else if (modelData.type === "disk") {
+                                    return Math.round(SysMonitor.disk.activeTime * 100) + "%  " +
+                                           SysMonitor.disk.model;
                                 }
                                 return "";
                             }

@@ -10,6 +10,7 @@
 #include "cpuinfo.h"
 #include "meminfo.h"
 #include "wifiinfo.h"
+#include "diskinfo.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +28,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<CpuInfo>("Cutie.SysMonitor", 1, 0, "CpuInfo", "Managed by SystemMonitor");
     qmlRegisterUncreatableType<MemoryInfo>("Cutie.SysMonitor", 1, 0, "MemoryInfo", "Managed by SystemMonitor");
     qmlRegisterUncreatableType<WifiInfo>("Cutie.SysMonitor", 1, 0, "WifiInfo", "Managed by SystemMonitor");
+    qmlRegisterUncreatableType<DiskInfo>("Cutie.SysMonitor", 1, 0, "DiskInfo", "Managed by SystemMonitor");
 
     // (Keep your existing SystemMonitor singleton registration)
     qmlRegisterSingletonType<SystemMonitor>(

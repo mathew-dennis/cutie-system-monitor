@@ -1,7 +1,7 @@
 #include "systemmonitor.h"
 
 SystemMonitor::SystemMonitor(QObject *parent)
-	: QObject(parent), m_cpu(this), m_memory(this), m_network(this)
+	: QObject(parent), m_cpu(this), m_memory(this), m_network(this), m_disk(this)
 {
 	connect(&m_timer, &QTimer::timeout, this, &SystemMonitor::poll);
 	m_timer.start(m_intervalMs);
@@ -11,8 +11,8 @@ SystemMonitor::SystemMonitor(QObject *parent)
 
 void SystemMonitor::poll()
 {
-	// MemoryInfo and WifiInfo each run their own QTimer and update
-	// themselves; CPU is the only sub-module driven from here.
+	// MemoryInfo, WifiInfo, and DiskInfo each run their own QTimer and
+	// update themselves; CPU is the only sub-module driven from here.
 	m_cpu.pollDynamicInfo(m_intervalMs, &SystemMonitor::pushHistory, kHistoryLength);
 }
 

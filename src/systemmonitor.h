@@ -8,20 +8,22 @@
 #include "cpuinfo.h"
 #include "meminfo.h"
 #include "wifiinfo.h"
+#include "diskinfo.h"
 
 // ============================================================================
-// SYSTEM MONITOR - composition root tying the three independent modules
-// (CpuInfo, MemoryInfo, WifiInfo) together and exposing them to QML.
+// SYSTEM MONITOR - composition root tying the four independent modules
+// (CpuInfo, MemoryInfo, WifiInfo, DiskInfo) together and exposing them to QML.
 // ============================================================================
 
 class SystemMonitor : public QObject
 {
 	Q_OBJECT
 
-	// Sub-module property objects (access via cpu.*, memory.*, network.*)
+	// Sub-module property objects (access via cpu.*, memory.*, network.*, disk.*)
 	Q_PROPERTY(CpuInfo* cpu READ cpu CONSTANT)
 	Q_PROPERTY(MemoryInfo* memory READ memory CONSTANT)
 	Q_PROPERTY(WifiInfo* network READ network CONSTANT)
+	Q_PROPERTY(DiskInfo* disk READ disk CONSTANT)
 
 public:
 	explicit SystemMonitor(QObject *parent = nullptr);
@@ -29,6 +31,7 @@ public:
 	CpuInfo* cpu() { return &m_cpu; }
 	MemoryInfo* memory() { return &m_memory; }
 	WifiInfo* network() { return &m_network; }
+	DiskInfo* disk() { return &m_disk; }
 
 	// Shared formatting helpers used by QML pages
 	Q_INVOKABLE QString formatBytes(quint64 bytes) const;
@@ -45,9 +48,10 @@ private:
 	QTimer m_timer;
 	int m_intervalMs = 1000;
 
-	// Sub-module instances. Memory and Network poll themselves on their
-	// own internal QTimers, so only CPU needs driving from m_timer.
+	// Sub-module instances. Memory, Network, and Disk poll themselves on
+	// their own internal QTimers, so only CPU needs driving from m_timer.
 	CpuInfo m_cpu;
 	MemoryInfo m_memory;
 	WifiInfo m_network;
+	DiskInfo m_disk;
 };
