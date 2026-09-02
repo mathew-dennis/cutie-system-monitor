@@ -140,6 +140,8 @@ CutiePage {
 
 								// Active time
 								ColumnLayout {
+									Layout.fillWidth: true
+									Layout.preferredWidth: 0
 									spacing: 2
 									CutieLabel { text: qsTr("Active time"); font.pixelSize: 12; opacity: 0.65 }
 									CutieLabel { text: Math.round(SysMonitor.disk.activeTime * 100) + "%"; font.pixelSize: 20; font.bold: true }
@@ -147,6 +149,8 @@ CutiePage {
 
 								// Average response time
 								ColumnLayout {
+									Layout.fillWidth: true
+									Layout.preferredWidth: 0
 									spacing: 2
 									CutieLabel { text: qsTr("Avg. response time"); font.pixelSize: 12; opacity: 0.65 }
 									CutieLabel { text: SysMonitor.disk.averageResponseTime.toFixed(1) + " ms"; font.pixelSize: 20; font.bold: true }
@@ -154,6 +158,8 @@ CutiePage {
 
 								// Read speed
 								ColumnLayout {
+									Layout.fillWidth: true
+									Layout.preferredWidth: 0
 									spacing: 2
 									CutieLabel { text: qsTr("Read speed"); font.pixelSize: 12; opacity: 0.65 }
 									CutieLabel { text: SysMonitor.formatRate(SysMonitor.disk.readSpeed); font.pixelSize: 18; font.bold: true }
@@ -161,6 +167,8 @@ CutiePage {
 
 								// Write speed
 								ColumnLayout {
+									Layout.fillWidth: true
+									Layout.preferredWidth: 0
 									spacing: 2
 									CutieLabel { text: qsTr("Write speed"); font.pixelSize: 12; opacity: 0.65 }
 									CutieLabel { text: SysMonitor.formatRate(SysMonitor.disk.writeSpeed); font.pixelSize: 18; font.bold: true }
@@ -168,6 +176,8 @@ CutiePage {
 
 								// Total read
 								ColumnLayout {
+									Layout.fillWidth: true
+									Layout.preferredWidth: 0
 									spacing: 2
 									CutieLabel { text: qsTr("Total read"); font.pixelSize: 12; opacity: 0.65 }
 									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.disk.totalRead); font.pixelSize: 18; font.bold: true }
@@ -175,6 +185,8 @@ CutiePage {
 
 								// Total written
 								ColumnLayout {
+									Layout.fillWidth: true
+									Layout.preferredWidth: 0
 									spacing: 2
 									CutieLabel { text: qsTr("Total written"); font.pixelSize: 12; opacity: 0.65 }
 									CutieLabel { text: SysMonitor.formatBytes(SysMonitor.disk.totalWritten); font.pixelSize: 18; font.bold: true }
@@ -234,11 +246,9 @@ CutiePage {
 						font.pixelSize: 16
 					}
 
-					GridLayout {
+					RowLayout {
 						Layout.fillWidth: true
-						columns: 2
-						columnSpacing: 10
-						rowSpacing: 12
+						spacing: 16
 
 						Repeater {
 							model: 2
@@ -246,6 +256,7 @@ CutiePage {
 							ColumnLayout {
 								id: rateDelegate
 								Layout.fillWidth: true
+								Layout.preferredWidth: 0
 								spacing: 4
 
 								readonly property bool isRead: index === 0
@@ -266,6 +277,7 @@ CutiePage {
 										text: SysMonitor.formatRate(rateDelegate.speedValue)
 										font.pixelSize: 12
 										opacity: 0.7
+										horizontalAlignment: Text.AlignRight
 									}
 								}
 
