@@ -18,6 +18,8 @@ set(cutie-sysmonitor_SOURCES
         src/meminfo.h
         src/wifiinfo.cpp
         src/wifiinfo.h
+        src/diskinfo.cpp
+        src/diskinfo.h
 )
 
 qt_add_resources(APP_RESOURCES
