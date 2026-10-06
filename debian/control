@@ -22,4 +22,5 @@ Pre-Depends: ${misc:Pre-Depends}
 Depends: ${misc:Depends},
          ${shlibs:Depends},
          qml6-module-cutie,
+         qml6-module-cutiebattery,
 Description: This package contains the Cutie System Monitor app.

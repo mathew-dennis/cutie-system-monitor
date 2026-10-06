@@ -6,5 +6,6 @@
         <file>MemoryPage.qml</file>
         <file>NetworkPage.qml</file>
         <file>DiskPage.qml</file>
+        <file>BatteryPage.qml</file>
     </qresource>
 </RCC>

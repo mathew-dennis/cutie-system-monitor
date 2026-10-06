@@ -2,6 +2,7 @@ import Cutie
 import QtQuick
 import QtQuick.Layouts
 import Cutie.SysMonitor
+import Cutie.Battery
 
 CutieWindow {
     id: mainWindow
@@ -35,6 +36,12 @@ CutieWindow {
             title: qsTr("Disk"),
             color: "#2ca02c", // Green
             componentPath: "DiskPage.qml"
+        },
+        {
+            type: "battery",
+            title: qsTr("Battery"),
+            color: "#69a86e",
+            componentPath: "BatteryPage.qml"
         }
     ]
 
@@ -84,6 +91,7 @@ CutieWindow {
                                 if (modelData.type === "memory") return SysMonitor.memory.usageHistory;
                                 if (modelData.type === "network") return SysMonitor.network.receiveHistory;
                                 if (modelData.type === "disk") return SysMonitor.disk.activeTimeHistory;
+                                if (modelData.type === "battery") return BatteryHistory.points.map(function(point) { return Number(point.value) / 100; });
                                 return [];
                             }
                         }
@@ -119,6 +127,8 @@ CutieWindow {
                                 } else if (modelData.type === "disk") {
                                     return Math.round(SysMonitor.disk.activeTime * 100) + "%  " +
                                            SysMonitor.disk.model;
+                                } else if (modelData.type === "battery") {
+                                    return Math.round(BatteryHistory.percentage) + "%  " + BatteryHistory.stateString;
                                 }
                                 return "";
                             }
