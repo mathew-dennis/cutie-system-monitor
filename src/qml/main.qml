@@ -173,6 +173,7 @@ CutieWindow {
                 rightMargin: 16
                 bottomMargin: 12
             }
+            clip: true
             height: 104
             color: Qt.rgba(Atmosphere.secondaryAlphaColor.r,
                 Atmosphere.secondaryAlphaColor.g,
