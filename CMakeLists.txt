@@ -1,60 +1,39 @@
 cmake_minimum_required(VERSION 3.16)
-project(cutiesysteminfo VERSION 0.1 LANGUAGES CXX)
+project(cutie-sysmonitor VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick Qml Network LinguistTools)
+
 qt_standard_project_setup()
 
-set(lib_SOURCES
-    src/cutiesysteminfo.h
-    src/cutiesysteminfo.cpp)
-
-set(plugin_SOURCES
-    src/plugin.cpp src/plugin.h)
-
-qt6_add_library(cutiesysteminfo
-    SHARED ${lib_SOURCES}
+set(cutie-sysmonitor_SOURCES
+        src/main.cpp
+        src/systemmonitor.cpp
+        src/systemmonitor.h
+        src/cpuinfo.cpp
+        src/cpuinfo.h
+        src/meminfo.cpp
+        src/meminfo.h
+        src/wifiinfo.cpp
+        src/wifiinfo.h
+        src/diskinfo.cpp
+        src/diskinfo.h
 )
 
-qt6_add_qml_module(qmlcutiesysteminfoplugin
-    URI Cutie.Systeminfo
-    VERSION ${PROJECT_VERSION}
-    PLUGIN_TARGET qmlcutiesysteminfoplugin
-    NO_GENERATE_PLUGIN_SOURCE
-    SOURCES
-        ${plugin_SOURCES}
-)
+qt_add_resources(APP_RESOURCES
+	${CMAKE_SOURCE_DIR}/src/qml/qml.qrc)
 
-set_target_properties(cutiesysteminfo PROPERTIES VERSION ${PROJECT_VERSION})
-set_target_properties(cutiesysteminfo PROPERTIES SOVERSION 0)
-set_target_properties(cutiesysteminfo PROPERTIES PUBLIC_HEADER src/cutiesysteminfo.h)
+qt_add_executable(cutie-sysmonitor ${cutie-sysmonitor_SOURCES} ${APP_RESOURCES})
 
-target_link_libraries(cutiesysteminfo PUBLIC
-    Qt::Core
-    Qt::Quick
-)
+qt_add_translations(cutie-sysmonitor
+    TS_FILES ${CMAKE_SOURCE_DIR}/translations/cutie-sysmonitor_fi.ts)
 
-target_link_libraries(qmlcutiesysteminfoplugin PUBLIC
-    Qt::Core
-    Qt::Quick
-    cutiesysteminfo
-)
+target_include_directories(cutie-sysmonitor PUBLIC src)
 
-configure_file(src/cutiesysteminfo.pc.in cutiesysteminfo.pc @ONLY)
+target_link_libraries(cutie-sysmonitor PUBLIC Qt::Core Qt::Quick Qt::Qml Qt::Network)
 
-install(TARGETS cutiesysteminfo
-    RUNTIME DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    BUNDLE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
-
-install(FILES ${CMAKE_BINARY_DIR}/cutiesysteminfo.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
-
-install(TARGETS qmlcutiesysteminfoplugin
-    RUNTIME DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt6/qml/Cutie/Systeminfo"
-    BUNDLE DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt6/qml/Cutie/Systeminfo"
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt6/qml/Cutie/Systeminfo"
-)
-
-install(DIRECTORY src/qml/Cutie/Systeminfo DESTINATION "${CMAKE_INSTALL_LIBDIR}/qt6/qml/Cutie")
+install(TARGETS cutie-sysmonitor RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install(FILES cutie-sysmonitor.desktop DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")
+install(FILES cutie-sysmonitor.svg DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps")
