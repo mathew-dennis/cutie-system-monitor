@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Layouts
 import Cutie.SysMonitor
 import Cutie.Battery
+import Cutie.Systeminfo
 
 CutieWindow {
     id: mainWindow
@@ -10,6 +11,10 @@ CutieWindow {
     height: 800
     visible: true
     title: qsTr("System Monitor")
+
+    CutieSystemInfo {
+        id: systemInfo
+    }
 
     // Added specific colors and types to match the image branding
     property var pages: [
@@ -51,8 +56,13 @@ CutieWindow {
 
         ListView {
             id: listView
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+                bottom: deviceInfoSummary.top
+            }
             model: mainWindow.pages
-            anchors.fill: parent
             header: CutiePageHeader {
                 title: mainWindow.title
             }
@@ -146,10 +156,64 @@ CutieWindow {
                     anchors.fill: parent
                     onClicked: {
                         var comp = Qt.createComponent(modelData.componentPath);
-                        if (comp.status === Component.Ready) {
+                        if (comp.status === Component.Ready)
                             mainWindow.pageStack.push(comp, {});
-                        }
                     }
+                }
+            }
+        }
+
+        Rectangle {
+            id: deviceInfoSummary
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+                leftMargin: 16
+                rightMargin: 16
+                bottomMargin: 12
+            }
+            height: 104
+            color: Qt.rgba(Atmosphere.secondaryAlphaColor.r,
+                Atmosphere.secondaryAlphaColor.g,
+                Atmosphere.secondaryAlphaColor.b, 0.1)
+            radius: 16
+
+            GridLayout {
+                anchors.fill: parent
+                anchors.margins: 14
+                columns: 2
+                columnSpacing: 16
+                rowSpacing: 8
+
+                ColumnLayout {
+                    spacing: 1
+                    CutieLabel { text: qsTr("Shell"); font.pixelSize: 10; opacity: 0.65 }
+                    CutieLabel { text: qsTr("Cutie Shell"); font.pixelSize: 12; font.bold: true; elide: Text.ElideRight; maximumLineCount: 1 }
+                }
+                ColumnLayout {
+                    spacing: 1
+                    CutieLabel { text: qsTr("OS"); font.pixelSize: 10; opacity: 0.65 }
+                    CutieLabel { text: systemInfo.osInfo.osName; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight; maximumLineCount: 1 }
+                }
+                ColumnLayout {
+                    spacing: 1
+                    CutieLabel { text: qsTr("Kernel"); font.pixelSize: 10; opacity: 0.65 }
+                    CutieLabel { text: systemInfo.osInfo.kernel; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight; maximumLineCount: 1 }
+                }
+                ColumnLayout {
+                    spacing: 1
+                    CutieLabel { text: qsTr("Device"); font.pixelSize: 10; opacity: 0.65 }
+                    CutieLabel { text: systemInfo.hwInfo.device; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight; maximumLineCount: 1 }
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    var comp = Qt.createComponent("DeviceInformationPage.qml");
+                    if (comp.status === Component.Ready)
+                        mainWindow.pageStack.push(comp, { systemInfo: systemInfo });
                 }
             }
         }

@@ -7,5 +7,6 @@
         <file>NetworkPage.qml</file>
         <file>DiskPage.qml</file>
         <file>BatteryPage.qml</file>
+        <file>DeviceInformationPage.qml</file>
     </qresource>
 </RCC>
